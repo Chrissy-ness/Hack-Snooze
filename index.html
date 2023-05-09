@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="css/user.css">
   <link rel="stylesheet" href="css/stories.css">
   <link rel="stylesheet" href="css/nav.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,200,1,0" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,100,1,0" />
 </head>
 
 <body>
@@ -38,13 +38,12 @@
   <div class="navbar-brand">
     <a class="nav-link" href="#" id="nav-all">Hack or Snooze</a>
     |
-    <a class="nav-link" href="#" id="nav-submit">submit</a>
+    <a class="nav-link" href="#" id="nav-fave">Favorites</a>
     |
-    <a class="nav-link" href="#" id="nav-fav">favorited</a>
+    <a class="nav-link" href="#" id="nav-own">Own Stories</a>
     |
-    <a class="nav-link" href="#" id="nav-own-stories">my stories</a>
+    <a class="nav-link" href="#" id="nav-create">Create a Story</a>
   </div>
-
   <div class="nav-right">
     <a class="nav-link" href="#" id="nav-login">login/signup</a>
     <a class="nav-link" href="#" id="nav-user-profile"></a>
@@ -52,32 +51,34 @@
   </div>
 </nav>
 
-<!-- area for stories (all stories, user stories, favorites) -->
-<section class="stories-container container">
-    <form action="" class="hidden" id="submit-form">
+<!-- new form for submit -->
+<section id="submit-container" class="hidden container">
+    <form id="submit-form">
+        <input type="text" placeholder="Title">
+        <input type="text" placeholder="Author">
+        <input type="text" placeholder="URL">
         <div>
-            <input id="new-title" type="text" placeholder="Title">
-        </div>
-        <div>
-            <input id="new-author" type="text" placeholder="Author">
-        </div>
-        <div>
-            <input id="new-url" type="text" placeholder="URL">
-        </div>
-        <div>
-            <button id="submit-btn">submit</button>
-            <button id="cancel-btn">cancel</button>
+            <button type="sub">submit</button>
+            <button type="can">cancel</button>
         </div>
     </form>
+</section>
+
+
+<!-- area for stories (all stories, user stories, favorites) -->
+<section class="stories-container container">
 
   <!-- loading message (removed by JS after stories loaded) -->
   <div id="stories-loading-msg">Loading&hellip;</div>
 
   <!-- List of all stories -->
   <ol id="all-stories-list" class="stories-list"></ol>
-  <ol id="own-stories-list" class="hidden"></ol>
-  <ol id="favorited-stories-list" class="stories-list"></ol>
 
+  <!-- List of own stories -->
+  <ol id="favorite-stories-list" class="stories-list hidden"></ol>
+  
+  <!-- List of own stories -->
+  <ol id="own-stories-list" class="stories-list hidden"></ol>
 </section>
 
 <!-- Login and signup forms -->

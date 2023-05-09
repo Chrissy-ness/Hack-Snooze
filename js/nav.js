@@ -35,91 +35,128 @@ function updateNavOnLogin() {
   $navUserProfile.text(`${currentUser.username}`).show();
 }
 
-//When the navigation submit button is clicked, show the submit form. 
-$navSubmit.on("click", function(e) {
+/** Show create form when the nav-create is clicked
+ *  Get the values of the inputs when submit is clicked, then reset all values and alert user that story has been created
+ *  Reset all values and hide submit form container when cancel is clicked
+ */
+
+$navCreate.on("click", function(e) {
   e.preventDefault();
-  $submitForm.show();
+  $submitContainer.show();
 })
 
-$navFav.on("click", function(e) {
+$submit.on("click", async function(e) {
   e.preventDefault();
+
+  let $title = $("input[placeholder|=Title").val();
+  let $author = $("input[placeholder|=Author").val();
+  let $url = $("input[placeholder|=URL").val();
+
+  /** Check for valid url */
+  const response = $url.includes("http://") || $url.includes("https://") ? true : false;
+
+  if(response !== true) {
+    return alert("URL must include (http://) or (https://)");
+  } 
+
+  /** Use addStory method from models.js */
+  let newStory = await storyList.addStory(currentUser, {
+    title: $title, 
+    author: $author, 
+    url: $url,
+  });
+
+  newStory instanceof Story ? alert("New story added! Reloading Page!") : alert("Failed to create story!");
+  $submitForm.trigger("reset");
+  $submitContainer.hide(); 
+
+  setTimeout(function() {
+    location.reload(true);
+  },2000);
+})
+
+$cancel.on("click", function(e) {
+  e.preventDefault();
+
+  $submitForm.trigger("reset");
+  $submitContainer.hide();
+})
+
+$navOwn.on("click", function(e) {
+  e.preventDefault();
+
   $allStoriesList.hide();
-  $favoritedList.show();
+  $favoritesList.hide();
+  $ownList.show();
 })
 
-//When submit is clicked, call on the api to create a new story and append it to the current story list. 
-$submitBtn.on("click", async function(e) {
+$body.on("click", ".delete", async function(e) {
   e.preventDefault();
-  const titleInt = $newTitle.val();
-  const authorInt = $newAuthor.val();
-  const urlInt = $newURL.val();
 
-  const storyObj = {title: titleInt, author: authorInt, url: urlInt};
-
-  let newStory = await storyList.addStory(currentUser, storyObj);
-  
-  if(newStory instanceof Story) {
-    alert("New Story Added!");
-  }
-
-  this.hide();
-})
-
-
-//When a star is hovered on, change it's background color to yellow;
-
-$body.on("mouseenter", ".material-symbols-outlined", function() {
-  $(this).css({
-    cursor: "pointer",
-  })
-})
-
-$body.on("click", ".material-symbols-outlined", async function() {
-  const mainClass = "material-symbols-outlined";
-  const targetTHIS = $(this);
   const storyId = $(this).closest("li").attr("id");
+  const response = await storyList.removeStory(currentUser, storyId);
 
-  const targetData = await axios({
+  if(response === true) {
+    alert("Story has been deleted! Reloading Page!");
+    
+    setTimeout(function() {
+      location.reload(true);
+    },2000);
+  }
+})
+
+$navAll.on("click", function(e) {
+  $ownList.hide();
+  $favoritesList.hide();
+})
+
+/** When star is clicked, add events and append to page */
+$body.on("mouseenter", ".material-symbols-outlined", function() {
+  $(this).css({cursor: "pointer"});
+})
+
+$body.on("click", ".material-symbols-outlined", async function(e) {
+  e.preventDefault();
+  const $clickedStar = $(this);
+  const storyId = $clickedStar.closest("li").attr("id");
+  const response = await axios({
     url: `${BASE_URL}/stories/${storyId}`,
     method: "GET",
-    params: {
-      storyId: storyId
-    },
+    params: {storyId: storyId}
   })
+  
+  const story = response.data.story;
 
-  const targetStory = targetData.data.story;
-  
-  $(this).attr("class") == mainClass ?  addToFav() : removeFromFav();
-  
-  async function addToFav() {
-    targetTHIS.addClass("orange");
-    currentUser.addFavoriteStory(targetStory);
-    putFavoritesOnPage();
+  $clickedStar.attr("class") === "material-symbols-outlined" ? addFavorite() : removeFavorite();
+
+  async function addFavorite() {
+    $clickedStar.addClass("orange");
+    await currentUser.addToFavorites(story);
+
+    alert("Added a new favorite! Refreshing Page!");
+
+    setTimeout(function() {
+      location.reload(true);
+    },2000);
   }
 
-  async function removeFromFav() {
-    targetTHIS.removeClass("orange")
-    currentUser.removeFavoriteStory(targetStory);
-    console.log(currentUser.favorites);
-    putFavoritesOnPage();
+  async function removeFavorite() {
+    $clickedStar.removeClass("orange");
+    await currentUser.removeFromFavorites(story);
+
+    alert("Removed a favorite! Refreshing Page!");
+
+    setTimeout(function() {
+      location.reload(true);
+    },2000);
   }
 })
 
-$("#nav-all").on("click", function() {
-  $favoritedList.hide();
-})
-
-$("#nav-own-stories").on("click", function(e) {
+$navFave.on("click", function(e) {
   e.preventDefault();
+
   $allStoriesList.hide();
-  $favoritedList.hide();
-  $ownStoriesList.show();
-})
+  $ownList.hide();
 
-$body.on("click", ".deleter", async function() {
-  const targetId = $(this).closest("li").attr('id');
-
-  storyList.removeStory(currentUser, targetId);
-  currentUser.ownStories = currentUser.ownStories.filter(s => s.storyId !== targetId);
-  putOwnOnPage();
+  $favoritesList.show();
 })

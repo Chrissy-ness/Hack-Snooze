@@ -6,8 +6,6 @@ const $body = $("body");
 
 const $storiesLoadingMsg = $("#stories-loading-msg");
 const $allStoriesList = $("#all-stories-list");
-const $ownStoriesList = $("#own-stories-list");
-const $favoritedList = $("#favorited-stories-list");
 
 const $loginForm = $("#login-form");
 const $signupForm = $("#signup-form");
@@ -15,18 +13,22 @@ const $signupForm = $("#signup-form");
 const $navLogin = $("#nav-login");
 const $navUserProfile = $("#nav-user-profile");
 const $navLogOut = $("#nav-logout");
-const $navFav = $("#nav-fav");
 
-//submit form variables:
+// New variables in the HTML
+
+const $navFave = $("#nav-fave");
+const $navOwn = $("#nav-own");
+const $navCreate = $("#nav-create");
+
+const $submitContainer = $("#submit-container");
 const $submitForm = $("#submit-form");
-const $navSubmit = $("#nav-submit");
-const $newTitle = $("#new-title");
-const $newAuthor = $("#new-author");
-const $newURL = $("#new-url");
+const $submit = $("button[type|=sub");
+const $cancel = $("button[type|=can");
 
-const $submitBtn = $("#submit-btn");
-const $cancelBtn = $("#cancel-btn");
+const $favoritesList = $("#favorite-stories-list");
+const $ownList = $('#own-stories-list');
 
+const $navAll = $("#nav-all");
 
 
 /** To make it easier for individual components to show just themselves, this
@@ -40,6 +42,7 @@ function hidePageComponents() {
     $loginForm,
     $signupForm,
   ];
+
   components.forEach(c => c.hide());
 }
 

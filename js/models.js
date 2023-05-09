@@ -75,34 +75,35 @@ class StoryList {
 
   async addStory(user, newStory) {
     // UNIMPLEMENTED: complete this function!
-    const userToken = user.loginToken;
+    const token = user.loginToken;
     const response = await axios({
       url: `${BASE_URL}/stories`,
       method: "POST",
       data: {
-        token: userToken,
+        token: token,
         story: newStory,
       }
-    });
+    })
 
     const story = new Story(response.data.story);
-    this.stories.unshift(story);
+    
     user.ownStories.unshift(story);
-
+    this.stories.unshift(story);
+    
     return story;
   }
 
   async removeStory(user, storyId) {
-    const userToken = user.loginToken;
-
+    const token = user.loginToken;
     await axios({
       url: `${BASE_URL}/stories/${storyId}`,
       method: "DELETE",
-      data: {token: userToken}
+      data: {token: token},
     })
 
-    this.stories = this.stories.filter(story => story.storyId !== storyId);
+    this.stories.filter(s => s.storyId !== storyId);
 
+    return true;
   }
 }
 
@@ -122,7 +123,7 @@ class User {
                 name,
                 createdAt,
                 favorites = [],
-                ownStories = []
+                ownStories = [],
               },
               token) {
     this.username = username;
@@ -222,24 +223,30 @@ class User {
     }
   }
 
-  async addFavoriteStory(story) {
-    this.favorites.push(story);
-    await this._addOrRemoveFavorite("add", story);
+  /** Methods to call when adding or removing favorites */
+  async addToFavorites(story) {
+    this.favorites.unshift(story);
+    
+
+    this._addOrRemoveFavorite("add", story);
+
+    console.log(this.favorites)
   }
 
-  async removeFavoriteStory(story) {
+  async removeFromFavorites(story) { 
     this.favorites = this.favorites.filter(s => s.storyId !== story.storyId);
-    await this._addOrRemoveFavorite("remove", story);
+
+    this._addOrRemoveFavorite("delete", story);
+    console.log(this.favorites);
   }
 
   async _addOrRemoveFavorite(newState, story) {
     const method = newState === "add" ? "POST" : "DELETE";
-
-    const token = this.loginToken;
+    const username = this.username;
     await axios({
-      url: `${BASE_URL}/users/${this.username}/favorites/${story.storyId}`,
+      url: `${BASE_URL}/users/${username}/favorites/${story.storyId}`,
       method: method,
-      data: {token},
+      data : {token: this.loginToken},
     })
   }
 }
